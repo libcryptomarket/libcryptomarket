@@ -6,6 +6,7 @@ from libcryptomarket.api.cryptocompare_api import (
     get_histo, CryptocompareHisto
 )
 
+
 def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
                           period=None, limit=0, from_time=None, to_time=None):
     """Get historical prices.
@@ -30,9 +31,9 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
             raise ValueError("Input parameter exchange cannot be None.")
 
         if ((limit > 0) +
-            ((from_time is not None) or (to_time is not None)) > 1):
-            raise ValuError("Only accept input parameter limit, or from_time"
-                            " and to_time pair.")
+                ((from_time is not None) or (to_time is not None)) > 1):
+            raise ValueError("Only accept input parameter limit, or from_time"
+                             " and to_time pair.")
 
         # Parse from (first 3) and to (last 3) symbol from the parameter
         # symbol.
@@ -69,9 +70,3 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
         return data.sort_values(['r_time'])
     else:
         raise ValueError("No source is called {0}".format(source))
-
-
-
-
-
-

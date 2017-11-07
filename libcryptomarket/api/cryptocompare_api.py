@@ -1,6 +1,5 @@
 #!/bin/python
 import requests
-import json
 from datetime import datetime
 
 API_URL = "https://min-api.cryptocompare.com/data/"
@@ -54,6 +53,7 @@ def get_coinlist():
     url = API_URL + "coinlist"
 
     return requests.get(url).json()
+
 
 def get_histo(period, fsym, tsym, e, limit=None, toTs=None):
     """Return historical prices.

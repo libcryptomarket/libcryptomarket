@@ -12,7 +12,8 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'pandas>=0.20.0'
+    'pandas>=0.20.0',
+    'requests'
 ]
 
 setup_requirements = [
