@@ -49,6 +49,7 @@ clean-test: ## remove test and coverage artifacts
 
 autopep8: ## autopep8 to clean 
 	autopep8 --aggressive --in-place --recursive libcryptomarket/*/*.py
+	autopep8 --aggressive --in-place --recursive libcryptomarket/*.py
 	autopep8 --aggressive --in-place --recursive tests/*.py
 
 lint: ## check style with flake8

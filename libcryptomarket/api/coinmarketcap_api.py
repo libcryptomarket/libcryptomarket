@@ -5,13 +5,14 @@ from datetime import datetime
 
 TICKET_URL = "https://api.coinmarketcap.com/v1/ticker/"
 
+
 class CoinMarketCapApiTicker:
     """Result class of query /ticker
     """
 
     def __init__(self, **kwargs):
         """Constructor.
-        
+
         Constructed from the request result like the following
             {
                 "id": "bitcoin",
@@ -46,6 +47,7 @@ class CoinMarketCapApiTicker:
         self.r_last_updated = datetime.fromtimestamp(
             int(kwargs["last_updated"]))
 
+
 def get_ticker(coin=None):
     """Return the ticker of all coins or the particular coin.
 
@@ -59,5 +61,4 @@ def get_ticker(coin=None):
     if coin is not None:
         url += coin
 
-    return [CoinMarketCapApiTicker(**ret)
-            for ret in requests.get(url).json()]
+    return requests.get(url).json()
