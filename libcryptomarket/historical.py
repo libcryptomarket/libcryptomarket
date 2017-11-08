@@ -67,6 +67,8 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
             data += func()['Data']
 
         data = pd.DataFrame([CryptocompareHisto(**e).__dict__ for e in data])
-        return data.sort_values(['r_time'])
+        data = data.set_index(['r_time'])
+        data.index.name = 'datetime'
+        return data
     else:
         raise ValueError("No source is called {0}".format(source))

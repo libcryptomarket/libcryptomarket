@@ -1,13 +1,15 @@
 import requests
+from datetime import datetime
 
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
 from libcryptomarket.instrument import get_instruments
+from libcryptomarket.historical import get_historical_prices
 
 
 def test_get_instruments_cryptocompare(monkeypatch):
-    def mockreturn(url):
+    def mockreturn(url, *args, **kwargs):
         # The result is from request.get(...).json()
         class MockReturnClass:
             @classmethod
@@ -91,3 +93,73 @@ def test_get_instruments_cryptocompare(monkeypatch):
             'r_url': '/coins/bcn/overview'}])
     assert_frame_equal(result.set_index(['r_id']).sort_index(),
                        expected_result.set_index(['r_id']).sort_index())
+
+
+def test_get_historical_prices_cryptocompare(monkeypatch):
+    def mockreturn(url, *args, **kwargs):
+        # The result is from request.get(...).json()
+        class MockReturnClass:
+            @classmethod
+            def json(cls):
+                # Query all symbols
+                return {
+                    'Aggregated': False,
+                    'ConversionType': {
+                        'conversionSymbol': '',
+                        'type': 'force_direct'},
+                    'Data': [
+                        {
+                            'close': 0.007707,
+                            'high': 0.007716,
+                            'low': 0.007701,
+                            'open': 0.00771,
+                            'time': 1510045800,
+                            'volumefrom': 289.12,
+                            'volumeto': 2.23
+                        },
+                        {
+                            'close': 0.0077,
+                            'high': 0.007716,
+                            'low': 0.0077,
+                            'open': 0.007707,
+                            'time': 1510045860,
+                            'volumefrom': 33.53,
+                            'volumeto': 0.2586
+
+                        }]
+                    }
+
+        return MockReturnClass()
+
+    monkeypatch.setattr(requests, 'get', mockreturn)
+
+    # Test to get historical prices
+    result = get_historical_prices(source='cryptocompare',
+                                   period='minute',
+                                   exchange='Poloniex',
+                                   symbol='LTCBTC')
+
+
+    expected_result = pd.DataFrame([
+        {
+            'r_close': 0.007707,
+            'r_high': 0.007716,
+            'r_low': 0.007701,
+            'r_open': 0.00771,
+            'r_time': datetime(2017, 11, 7, 9, 10),
+            'r_volumefrom': 289.12,
+            'r_volumeto': 2.23
+        },
+        {
+            'r_close': 0.0077,
+            'r_high': 0.007716,
+            'r_low': 0.0077,
+            'r_open': 0.007707,
+            'r_time': datetime(2017, 11, 7, 9, 11),
+            'r_volumefrom': 33.53,
+            'r_volumeto': 0.2586
+
+        }]).set_index(['r_time'])
+    expected_result.index.name = 'datetime'
+
+    assert_frame_equal(result, expected_result)
