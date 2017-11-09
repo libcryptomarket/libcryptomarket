@@ -3,6 +3,7 @@ import requests
 from datetime import datetime
 
 API_URL = "https://min-api.cryptocompare.com/data/"
+MAX_QUERY_LIMIT = 2000
 
 
 class CryptocompareCoinlist:

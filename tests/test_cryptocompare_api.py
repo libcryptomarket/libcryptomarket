@@ -127,7 +127,7 @@ def test_get_historical_prices_cryptocompare(monkeypatch):
                             'volumeto': 0.2586
 
                         }]
-                    }
+                }
 
         return MockReturnClass()
 
@@ -138,7 +138,6 @@ def test_get_historical_prices_cryptocompare(monkeypatch):
                                    period='minute',
                                    exchange='Poloniex',
                                    symbol='LTCBTC')
-
 
     expected_result = pd.DataFrame([
         {

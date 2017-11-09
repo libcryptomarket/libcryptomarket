@@ -35,6 +35,10 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
             raise ValueError("Only accept input parameter limit, or from_time"
                              " and to_time pair.")
 
+        if (from_time is None) ^ (to_time is None):
+            raise ValueError("Cannot accept either from_time or to_time is "
+                             "None")
+
         # Parse from (first 3) and to (last 3) symbol from the parameter
         # symbol.
         from_sym = symbol[:3]
@@ -45,6 +49,7 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
 
         data = []
         if limit > 0:
+            # Get the data by limit of records
             to_time = 0
 
             while limit > 0:
@@ -55,20 +60,40 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
 
                 if len(response) == 0:
                     # Terminate if no further response
-                    limit = 0
+                    break
                 else:
                     data += response
                     limit -= len(response)
                     to_time = response[0]['time'] - 1
+        elif from_time is not None and to_time is not None:
+            # Get the data by time range
+            from libcryptomarket.api.cryptocompare_api import MAX_QUERY_LIMIT
+            from_time_ts = int(from_time.timestamp())
+            to_time_ts = int(to_time.timestamp())
 
-        elif from_time is not None or to_time is not None:
-            raise NotImplementedError()
+            while from_time_ts < to_time_ts:
+                response = func(limit=MAX_QUERY_LIMIT,
+                                toTs=to_time_ts)['Data']
+
+                if len(response) == 0:
+                    # Terminate if no further response
+                    break
+                else:
+                    data += response
+                    to_time_ts = response[0]['time'] - 1
+
         else:
             data += func()['Data']
 
         data = pd.DataFrame([CryptocompareHisto(**e).__dict__ for e in data])
+        # Filter only valid time range
+        if from_time is not None and to_time is not None:
+            data = data[(data['r_time'] >= from_time) &
+                        (data['r_time'] <= to_time)]
+
         data = data.set_index(['r_time'])
         data.index.name = 'datetime'
+
         return data
     else:
         raise ValueError("No source is called {0}".format(source))
