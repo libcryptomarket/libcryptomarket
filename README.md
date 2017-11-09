@@ -12,7 +12,7 @@ query the data without pain.
 
 ## Prerequisite
 
-Python 3.x and pip.
+Python 3.5+
 
 ## Installation
 
