@@ -42,12 +42,14 @@ instruments = get_instruments()
 Run
 
 ```
+from datetime import datetime
 from libcryptomarket.historical import get_historical_prices
 
 prices = get_historical_prices(symbol='LTCBTC',
                                exchange='Poloniex',
                                period="hour",
-                               limit=4000).set_index(['r_time'])
+                               from_time=datetime(2017, 5, 1),
+                               to_time=datetime(2017, 8, 1))
 ```
 
 Then you can get historical price in ascending order seamlessly, even though
