@@ -1,9 +1,12 @@
 #!/bin/python
 import requests
 from datetime import datetime
+import logging
 
 API_URL = "https://min-api.cryptocompare.com/data/"
 MAX_QUERY_LIMIT = 2000
+
+logger = logging.getLogger(__name__)
 
 
 class CryptocompareCoinlist:
@@ -83,4 +86,16 @@ def get_histo(period, fsym, tsym, e, limit=None, toTs=None):
     if toTs is not None:
         params["toTs"] = toTs
 
-    return requests.get(url, params=params).json()
+    r = requests.get(url, params=params)
+
+    # Errors and warnings
+    r.raise_for_status()
+
+    # The api raises a 200 for a warning
+    rjson = r.json()
+    if len(rjson['Data']) == 0:
+        logger.warning(rjson["Message"])
+    elif rjson.get("Message", None):
+        logger.info(rjson["Message"])
+
+    return rjson
