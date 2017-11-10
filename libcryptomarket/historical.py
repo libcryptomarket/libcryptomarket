@@ -42,7 +42,7 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
         # Parse from (first 3) and to (last 3) symbol from the parameter
         # symbol.
         from_sym = symbol[:3]
-        to_sym = symbol[3:6]
+        to_sym = symbol[3:]
 
         func = partial(get_histo, period=period, fsym=from_sym, tsym=to_sym,
                        e=exchange)
