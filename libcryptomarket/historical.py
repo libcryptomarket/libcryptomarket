@@ -85,9 +85,12 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
         else:
             data += func()['Data']
 
+        if len(data) == 0:
+            return data
+
         data = pd.DataFrame([CryptocompareHisto(**e).__dict__ for e in data])
         # Filter only valid time range
-        if len(data) and from_time is not None and to_time is not None:
+        if from_time is not None and to_time is not None:
             data = data[(data['r_time'] >= from_time) &
                         (data['r_time'] <= to_time)]
 
