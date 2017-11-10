@@ -51,7 +51,7 @@ class CryptocompareHisto:
 def get_coinlist():
     """Return general info for all coins available.
     """
-    url = API_URL + "coinlist"
+    url = API_URL + "all/coinlist"
 
     return requests.get(url).json()
 
