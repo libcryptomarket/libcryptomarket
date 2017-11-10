@@ -88,14 +88,12 @@ def get_histo(period, fsym, tsym, e, limit=None, toTs=None):
 
     r = requests.get(url, params=params)
 
-    # Errors and warnings
+    # Raise html error status
     r.raise_for_status()
 
-    # The api raises a 200 for a warning
+    # The api raises a 200 for a warning, but passes a message
     rjson = r.json()
-    if len(rjson['Data']) == 0:
-        logger.warning(rjson["Message"])
-    elif rjson.get("Message", None):
-        logger.info(rjson["Message"])
+    if rjson.get("Message", None):
+        logger.warning('api returned message %r, for url %r', rjson["Message"], r.url)
 
     return rjson
