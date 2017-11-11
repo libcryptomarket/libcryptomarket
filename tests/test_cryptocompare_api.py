@@ -54,6 +54,10 @@ def test_get_instruments_cryptocompare(monkeypatch):
                     }
                 }
 
+            @classmethod
+            def raise_for_status(cls):
+                pass
+
         return MockReturnClass()
 
     monkeypatch.setattr(requests, 'get', mockreturn)
@@ -128,6 +132,10 @@ def test_get_historical_prices_cryptocompare(monkeypatch):
 
                         }]
                 }
+
+            @classmethod
+            def raise_for_status(cls):
+                pass
 
         return MockReturnClass()
 

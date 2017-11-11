@@ -56,7 +56,9 @@ def get_coinlist():
     """
     url = API_URL + "all/coinlist"
 
-    return requests.get(url).json()
+    r = requests.get(url)
+    r.raise_for_status()
+    return r.json()
 
 
 def get_histo(period, fsym, tsym, e, limit=None, toTs=None):
@@ -94,6 +96,9 @@ def get_histo(period, fsym, tsym, e, limit=None, toTs=None):
     # The api raises a 200 for a warning, but passes a message
     rjson = r.json()
     if rjson.get("Message", None):
-        logger.warning('api returned message %r, for url %r', rjson["Message"], r.url)
+        logger.warning(
+            'api returned message %r, for url %r',
+            rjson["Message"],
+            r.url)
 
     return rjson
