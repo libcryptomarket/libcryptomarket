@@ -145,12 +145,9 @@ def _get_historical_prices_cryptocompare(symbol, exchange, period,
 def _get_historical_prices_poloniex(symbol, period, from_time, to_time):
     from libcryptomarket.api.poloniex_api import get_return_chart_data
     data = get_return_chart_data(symbol, period, from_time, to_time)
-    if len(data) == 0 or isinstance(data, dict):
-        raise ValueError("Poloniex data is not in a right format.\n{0}".format(
-            data))
-
     data = pd.DataFrame(data)
-    data['date'] = data['date'].map(lambda x: pd.Timestamp(datetime.fromtimestamp(x)))
+    data['date'] = data['date'].map(
+        lambda x: pd.Timestamp(datetime.fromtimestamp(x)))
     data.columns = "r_" + data.columns.str.lower()
     data = data.set_index(['r_date'])
     data.index.name = 'datetime'

@@ -145,7 +145,7 @@ def test_get_historical_prices_cryptocompare(monkeypatch):
     result = get_historical_prices(source='cryptocompare',
                                    period='minute',
                                    exchange='Poloniex',
-                                   symbol='LTCBTC')
+                                   symbol='LTC/BTC')
 
     expected_result = pd.DataFrame([
         {

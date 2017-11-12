@@ -1,10 +1,8 @@
 #!/bin/python
 import requests
-from datetime import datetime
-import logging
-
 API_URL = "https://poloniex.com/public?command="
 VALID_PERIODS = [300, 900, 1800, 7200, 14400, 86400]
+
 
 def get_return_chart_data(currency_pair, period, start, end=None):
     """Return returnChartData.
@@ -29,4 +27,8 @@ def get_return_chart_data(currency_pair, period, start, end=None):
 
     r = requests.get(url)
     r.raise_for_status()
+    rjson = r.json()
+    if isinstance(rjson, dict) and 'error' in rjson.keys():
+        raise ValueError("Query error from Poloniex API ({0})".format(rjson))
+
     return r.json()

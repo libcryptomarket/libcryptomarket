@@ -4,6 +4,7 @@
 """The setup script."""
 
 from setuptools import setup, find_packages
+from libcryptomarket import __version__
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
@@ -28,7 +29,7 @@ test_requirements = [
 
 setup(
     name='libcryptomarket',
-    version='0.1.0',
+    version=__version__,
     description="Library for cryptocurrency market information.",
     long_description=readme + '\n\n' + history,
     author="Gavin Chan",
