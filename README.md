@@ -16,8 +16,13 @@ Python 3.5+
 
 ## Installation
 
-To install the library, please run the command to install via pip
+You can install it via pip for static version
 
+```
+pip install libcryptomarket
+```
+
+or development version
 
 ```
 pip install git+https://github.com/libcryptomarket/libcryptomarket.git
@@ -39,13 +44,17 @@ instruments = get_instruments()
 
 ### Historical
 
-Run
+Currently, multiple data sources of historical data are supported. 
+
+For example, for the source of [Cryptocompare](https://www.cryptocompare.com/api/#),
+run
 
 ```
 from datetime import datetime
 from libcryptomarket.historical import get_historical_prices
 
-prices = get_historical_prices(symbol='LTCBTC',
+prices = get_historical_prices(source='cryptocompare',
+                               symbol='LTC/BTC',
                                exchange='Poloniex',
                                period="hour",
                                from_time=datetime(2017, 5, 1),
@@ -55,6 +64,16 @@ prices = get_historical_prices(symbol='LTCBTC',
 Then you can get historical price in ascending order seamlessly, even though
 the limit has exceeded the source limit. The application helps continue
 querying until the data reaches the requirements.
+
+For the source of [Poloniex](https://poloniex.com/support/api/), run
+
+```
+prices = get_historical_prices(source='Poloniex',
+                               symbol='LTC/BTC',
+                               period="30m",
+                               from_time=datetime(2016, 1, 1),
+                               to_time=datetime(2017, 8, 1))
+```
 
 ## Contribution
 
