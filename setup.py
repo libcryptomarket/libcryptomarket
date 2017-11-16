@@ -35,7 +35,7 @@ setup(
     author="Gavin Chan",
     author_email='gavincyi@gmail.com',
     url='https://github.com/gavincyi/libcryptomarket',
-    packages=find_packages(include=['libcryptomarket']),
+    packages=['libcryptomarket', 'libcryptomarket.api'],
     include_package_data=True,
     install_requires=requirements,
     license="GNU General Public License v3",
