@@ -1,5 +1,5 @@
 from functools import partial
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 
@@ -73,6 +73,55 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
 
         return _get_historical_prices_poloniex(symbol, period,
                                                from_time, to_time)
+    elif source == 'bitmex':
+        if exchange is not None:
+            raise ValueError("Bitmex does not need exchange parameter.")
+
+        # Validate and transform periods
+        valid_periods = ["1m", "5m", "1h", "1d"]
+
+        period = period.lower()
+        if period not in valid_periods:
+            raise ValueError("Periods is not valid. " +
+                             ("Valid values (%s)" % str(valid_periods)))
+
+        # Validate and transform to_time and from_time
+        if (to_time is not None and from_time is not None and
+            to_time <= from_time):
+            raise ValueError("From time should not be greater than or "
+                             "equal to to time.")
+
+        ret = []
+
+        while from_time is None or to_time is None or from_time < to_time:
+            # Import and query
+            from libcryptomarket.api.bitmex_api import BitmexApi
+            exchange = BitmexApi(public_key=None, private_key=None, logger=None)
+            func = partial(exchange.trade_bucketed, symbol=symbol,
+                           binSize=period)
+
+            if from_time is not None:
+                from_time_s = from_time.strftime("%Y-%m-%dT%H:%M:%S")
+                func = partial(func, startTime=from_time_s)
+
+            if to_time is not None:
+                to_time_s = to_time.strftime("%Y-%m-%dT%H:%M:%S")
+                func = partial(func, endTime=to_time_s)
+
+            data = func()
+            data.raise_for_status()
+            data = pd.DataFrame(data.json())
+
+            if len(data) > 0:
+                ret.append(data)
+                from_time = data.iloc[-1, :]['timestamp'][:-5]
+                from_time = datetime.strptime(from_time, "%Y-%m-%dT%H:%M:%S")
+                from_time = from_time + timedelta(seconds=1)
+            else:
+                break
+
+        return pd.concat(ret)
+
     else:
         raise ValueError("No source is called {0}".format(source))
 

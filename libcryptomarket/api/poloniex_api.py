@@ -5,7 +5,7 @@ import hashlib
 import urllib
 from functools import partial
 
-from libcryptomarket.api.rest_api_connector import RestApiConnector
+from libcryptomarket.api.exchange_api import ExchangeApi
 API_URL = "https://poloniex.com/public?command="
 VALID_PERIODS = [300, 900, 1800, 7200, 14400, 86400]
 
@@ -66,80 +66,130 @@ def get_return_order_book(currency_pair, depth=10):
     return r.json()
 
 
-class PoloniexApi(RestApiConnector):
+class PoloniexApi(ExchangeApi):
     """Poloniex API.
     """
 
-    URL = 'https://poloniex.com/tradingApi'
-
-    AVAILABLE_TRADING_API = [
-        "returnBalances",
-        "returnCompleteBalances",
-        "returnDepositAddresses",
-        "generateNewAddress",
-        "returnDepositsWithdrawals",
-        "returnOpenOrders",
-        "returnTradeHistory",
-        "returnOrderTrades",
-        "buy",
-        "sell",
-        "cancelOrder",
-        "moveOrder",
-        "withdraw",
-        "returnFeeInfo",
-        "returnAvailableAccountBalances",
-        "returnTradableBalances",
-        "transferBalance",
-        "returnMarginAccountSummary",
-        "marginBuy",
-        "marginSell",
-        "getMarginPosition",
-        "closeMarginPosition",
-        "createLoanOffer",
-        "cancelLoanOffer",
-        "returnOpenLoanOffers",
-        "returnActiveLoans",
-        "returnLendingHistory",
-        "toggleAutoRenew",
-    ]
-
-    def __init__(self, public_key, private_key, logger=None):
+    def __init__(self, public_key=None, private_key=None, logger=None):
         """Constructor.
 
         :param public_key: Public key.
         :param private_key: Private key.
+        :param logger: Logger.
         """
-        RestApiConnector.__init__(self, url=PoloniexApi.URL, logger=logger)
+        ExchangeApi.__init__(self, public_key, private_key, logger)
 
-        self.__public_key = public_key
-        self.__private_key = private_key
-
-    def __getattr__(self, name):
-        """Get attribute.
+    @classmethod
+    def get_url(cls):
+        """Get API url.
         """
-        if name in PoloniexApi.AVAILABLE_TRADING_API:
-            return partial(self._request, command=name, http_method="POST")
-        else:
-            raise AttributeError("Trading method ({0}) ".format(name) +
-                                 "is not defined.")
+        return None
 
-    def _request(self, command, **kwargs):
-        """Send request.
-
-        :param kwargs: Named arguments.
+    @classmethod
+    def get_public_url(cls):
+        """Get public API url.
         """
-        kwargs["command"] = command
-        kwargs["nonce"] = self._generate_nonce()
+        return 'https://poloniex.com/public'
+
+    @classmethod
+    def get_private_url(cls):
+        """Get private API url.
+        """
+        return 'https://poloniex.com/tradingApi'
+
+    @classmethod
+    def get_public_calls(cls):
+        """Get public API calls.
+        """
+        return {
+            "returnTicker": "GET",
+            "return24Volume": "GET",
+            "returnOrderBook": "GET",
+            "returnTradeHistory": "GET",
+            "returnChartData": "GET",
+            "returnCurrencies": "GET",
+            "returnTicker": "GET",
+            "returnLoanOrders": "GET",
+        }
+
+    @classmethod
+    def get_private_calls(cls):
+        """Get public API calls.
+        """
+        return {
+            "returnBalances": "POST",
+            "returnCompleteBalances": "POST",
+            "returnDepositAddresses": "POST",
+            "generateNewAddress": "POST",
+            "returnDepositsWithdrawals": "POST",
+            "returnOpenOrders": "POST",
+            "returnTradeHistory": "POST",
+            "returnOrderTrades": "POST",
+            "buy": "POST",
+            "sell": "POST",
+            "cancelOrder": "POST",
+            "moveOrder": "POST",
+            "withdraw": "POST",
+            "returnFeeInfo": "POST",
+            "returnAvailableAccountBalances": "POST",
+            "returnTradableBalances": "POST",
+            "transferBalance": "POST",
+            "returnMarginAccountSummary": "POST",
+            "marginBuy": "POST",
+            "marginSell": "POST",
+            "getMarginPosition": "POST",
+            "closeMarginPosition": "POST",
+            "createLoanOffer": "POST",
+            "cancelLoanOffer": "POST",
+            "returnOpenLoanOffers": "POST",
+            "returnActiveLoans": "POST",
+            "returnLendingHistory": "POST",
+            "toggleAutoRenew": "POST"
+        }
+
+    @classmethod
+    def translate_call_name(cls, name):
+        """Translate API call name.
+
+        The class method name is always underscored (aligned with Python
+        standard.) This method is to translate underscored name to exchange
+        API call name.
+
+        :param name: Method name (underscored).
+        """
+        splitted_names = name.split('_')
+        if len(splitted_names) > 1:
+            splitted_names = ([splitted_names[0]] +
+                              [n.title() for n in splitted_names[1:]])
+
+        return ''.join(splitted_names)
+
+    def _request_public(self, name, http_method, **kwargs):
+        """Request public API call.
+
+        :param name: Method name.
+        :param http_method: HTTP method (POST, GET, DELETE).
+        """
+        kwargs['command'] = name
 
         return self._send_request(
-            command="",
-            http_method="POST",
-            public_key=self.__public_key,
-            private_key=self.__private_key,
-            params=None,
-            data=kwargs)
+            command=None, http_method=http_method, params=kwargs,
+            public_method=True)
 
-    def _generate_auth(self, public_key, private_key):
+    def _request_private(self, name, http_method, **kwargs):
+        """Request private API call.
+
+        :param name: Method name.
+        :param http_method: HTTP method (POST, GET, DELETE).
+        """
+        kwargs['command'] = name
+        kwargs['nonce'] = self._generate_nonce()
+
+        return self._send_request(
+            command=None, http_method=http_method, params=None, data=kwargs)
+
+    @classmethod
+    def _generate_auth(cls, public_key, private_key):
         """Generate authentication.
 
         :param public_key: Public key.
@@ -147,7 +197,8 @@ class PoloniexApi(RestApiConnector):
         """
         return None
 
-    def _generate_headers(self, command, http_method, params, data,
+    @classmethod
+    def _generate_headers(cls, command, http_method, params, data,
                           public_key, private_key):
         """Generate headers.
 
@@ -168,12 +219,10 @@ class PoloniexApi(RestApiConnector):
 
         return header
 
-    def _format_data(self, data):
+    @classmethod
+    def _format_data(cls, data):
         """Format the data to exchange desirable format.
 
         :param data: Data.
         """
-        if data is None:
-            return ""
-        else:
-            return data
+        return data
