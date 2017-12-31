@@ -3,7 +3,7 @@ import requests
 import hmac
 import hashlib
 import urllib
-from functools import partial
+# from functools import partial
 
 from libcryptomarket.api.exchange_api import ExchangeApi
 API_URL = "https://poloniex.com/public?command="

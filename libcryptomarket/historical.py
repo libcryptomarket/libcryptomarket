@@ -87,7 +87,7 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
 
         # Validate and transform to_time and from_time
         if (to_time is not None and from_time is not None and
-            to_time <= from_time):
+                to_time <= from_time):
             raise ValueError("From time should not be greater than or "
                              "equal to to time.")
 
@@ -96,7 +96,10 @@ def get_historical_prices(source='cryptocompare', symbol=None, exchange=None,
         while from_time is None or to_time is None or from_time < to_time:
             # Import and query
             from libcryptomarket.api.bitmex_api import BitmexApi
-            exchange = BitmexApi(public_key=None, private_key=None, logger=None)
+            exchange = BitmexApi(
+                public_key=None,
+                private_key=None,
+                logger=None)
             func = partial(exchange.trade_bucketed, symbol=symbol,
                            binSize=period)
 

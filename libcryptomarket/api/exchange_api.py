@@ -1,15 +1,17 @@
 #!/bin/python
 import requests
-import hmac
-import hashlib
-import urllib
+# import hmac
+# import hashlib
+# import urllib
 import json
 from functools import partial
 from time import time
 
+
 class ExchangeApi:
     """Exchange API connector.
     """
+
     def __init__(self, public_key, private_key, logger=None):
         """Constructor.
 
@@ -134,7 +136,6 @@ class ExchangeApi:
         :param data: Dict containing data information.
         """
         raise NotImplementedError("Not yet implemented.")
-
 
     def _send_request(self, command, http_method, params=None, data=None,
                       public_method=False):
