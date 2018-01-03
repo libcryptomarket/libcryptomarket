@@ -45,13 +45,13 @@ class ExchangeApi:
     def get_public_calls(cls):
         """Get public API calls.
         """
-        raise NotImplementedError("Public API calls getter not implemented")
+        return {}
 
     @classmethod
     def get_private_calls(cls):
         """Get private API calls.
         """
-        raise NotImplementedError("Private API calls getter not implemented")
+        return {}
 
     @classmethod
     def translate_call_name(cls, name):
