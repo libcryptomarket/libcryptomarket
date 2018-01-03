@@ -44,8 +44,7 @@ class GdaxApi(ExchangeApi):
     def get_private_calls(cls):
         """Get public API calls.
         """
-        return {
-        }
+        return {}
 
     @classmethod
     def translate_call_name(cls, name):
@@ -83,7 +82,7 @@ class GdaxApi(ExchangeApi):
         :param name: Method name.
         :param http_method: HTTP method (POST, GET, DELETE).
         """
-        raise NotImplementedError()
+        raise NotImplementedError("request private is not implemented.")
 
     # @classmethod
     # def _generate_auth(cls, public_key, private_key):

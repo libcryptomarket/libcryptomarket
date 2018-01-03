@@ -1,64 +1,76 @@
 #!/bin/python
-import requests
-from datetime import datetime
+from libcryptomarket.api.exchange_api import ExchangeApi
 
 
-TICKET_URL = "https://api.coinmarketcap.com/v1/ticker/"
-
-
-class CoinMarketCapApiTicker:
-    """Result class of query /ticker
+class CoinMarketCapApi(ExchangeApi):
+    """Coinmarketcap API.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, logger=None):
         """Constructor.
 
-        Constructed from the request result like the following
-            {
-                "id": "bitcoin",
-                "name": "Bitcoin",
-                "symbol": "BTC",
-                "rank": "1",
-                "price_usd": "573.137",
-                "price_btc": "1.0"
-                "24h_volume_usd": "72855700.0",
-                "market_cap_usd": "9080883500.0",
-                "available_supply": "15844176.0",
-                "total_supply": "15844176.0",
-                "percent_change_1h": "0.04",
-                "percent_change_24h": "-0.3",
-                "percent_change_7d": "-0.57",
-                "last_updated": "1472762067"
-            }
+        :param public_key: Public key.
+        :param private_key: Private key.
+        :param logger: Logger.
         """
-        self.r_id = kwargs["id"]
-        self.r_name = kwargs["name"]
-        self.r_symbol = kwargs["symbol"]
-        self.r_rank = int(kwargs["rank"] or '0')
-        self.r_price_usd = float(kwargs["price_usd"] or '0')
-        self.r_price_btc = float(kwargs["price_btc"] or '0')
-        self.r_24h_volume_usd = float(kwargs["24h_volume_usd"] or '0')
-        self.r_market_cap_usd = float(kwargs["market_cap_usd"] or '0')
-        self.r_available_supply = float(kwargs["available_supply"] or '0')
-        self.r_total_supply = float(kwargs["total_supply"] or '0')
-        self.r_percent_change_1h = float(kwargs["percent_change_1h"] or '0')
-        self.r_percent_change_24h = float(kwargs["percent_change_24h"] or '0')
-        self.r_percent_change_7d = float(kwargs["percent_change_7d"] or '0')
-        self.r_last_updated = datetime.fromtimestamp(
-            int(kwargs["last_updated"]))
+        ExchangeApi.__init__(self, public_key=None, private_key=None,
+                             logger=logger)
 
+    @classmethod
+    def get_url(cls):
+        """Get API url.
+        """
+        return "https://api.coinmarketcap.com/v1"
 
-def get_ticker(coin=None):
-    """Return the ticker of all coins or the particular coin.
+    @classmethod
+    def get_public_calls(cls):
+        """Get public API calls.
+        """
+        return {
+            "ticker": "GET",
+            "global": "GET"
+        }
 
-    It returns a list of `CoinMarketCapApiTicker` objects.
+    @classmethod
+    def get_private_calls(cls):
+        """Get private API calls.
+        """
+        return {}
 
-    :param coin: Coin id. Default None which means all coins are
-                 queued.
-    """
-    url = TICKET_URL
+    @classmethod
+    def translate_call_name(cls, name):
+        """Translate API call name.
 
-    if coin is not None:
-        url += coin
+        The class method name is always underscored (aligned with Python
+        standard.) This method is to translate underscored name to exchange
+        API call name.
 
-    return requests.get(url).json()
+        :param name: Method name (underscored).
+        """
+        return name
+
+    def _request_public(self, name, http_method, **kwargs):
+        """Request public API call.
+
+        :param name: Method name.
+        :param http_method: HTTP method (POST, GET, DELETE).
+        """
+        name_list = [name]
+
+        if name == "ticker" and "id" in kwargs.keys():
+            name_list.append(kwargs["id"])
+            del kwargs["id"]
+
+        name_list.append("")
+
+        return self._send_request(
+            command='/'.join(name_list), http_method=http_method,
+            public_method=True, params=kwargs)
+
+    def _request_private(self, name, http_method, **kwargs):
+        """Request private API call.
+
+        :param name: Method name.
+        :param http_method: HTTP method (POST, GET, DELETE).
+        """
+        raise RuntimeError("No private method provided")

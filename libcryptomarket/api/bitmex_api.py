@@ -6,7 +6,7 @@ class BitmexApi(ExchangeApi):
     """BitMEX API connector.
     """
 
-    def __init__(self, public_key, private_key, logger=None):
+    def __init__(self, public_key=None, private_key=None, logger=None):
         """Constructor.
 
         :param public_key: Public key.
@@ -82,4 +82,4 @@ class BitmexApi(ExchangeApi):
         # return self._send_request(
         #     command=name, http_method=http_method, params=kwargs,
         #     public_key=self._public_key, private_key=self._private_key)
-        raise NotImplementedError("request private is not implemented.")
+        raise NotImplementedError("Not support private api at this moment.")
