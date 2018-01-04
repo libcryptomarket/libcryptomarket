@@ -101,6 +101,11 @@ class BitfinexApi(ExchangeApi):
                              "trade:{}:{}".format(timeframe, symbol),
                              section])
 
+        self.log_info("Public request:\n" +
+                      "name: {}\n".format(name) +
+                      "http_method: {}\n".format(http_method) +
+                      "kwargs: {}".format(kwargs))
+
         return self._send_request(
             command=name, http_method=http_method,
             public_method=True, params=kwargs)

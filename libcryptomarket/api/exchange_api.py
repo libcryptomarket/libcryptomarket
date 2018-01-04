@@ -137,6 +137,18 @@ class ExchangeApi:
         """
         raise NotImplementedError("Not yet implemented.")
 
+    def log_info(self, msg, *args):
+        """Log in INFO.
+        """
+        if self._logger is not None:
+            self._logger.info(msg, *args)
+
+    def log_debug(self, msg, *args):
+        """Log in DEBUG.
+        """
+        if self._logger is not None:
+            self._logger.debug(msg, *args)
+
     def _send_request(self, command, http_method, params=None, data=None,
                       public_method=False):
         """Send request.
@@ -193,14 +205,13 @@ class ExchangeApi:
             headers = None
             auth = None
 
-        if self._logger is not None:
-            self._logger.info(">>> OUT:\n%s" % json.dumps({
-                "Method": http_method,
-                "Url": url,
-                "Params": params,
-                "Data": data,
-                "Headers": headers
-            }))
+        self.log_debug(">>> OUT:\n%s" % json.dumps({
+            "Method": http_method,
+            "Url": url,
+            "Params": params,
+            "Data": data,
+            "Headers": headers
+        }))
 
         if auth is None:
             response = R(url, params=params, data=data, headers=headers)
@@ -208,10 +219,9 @@ class ExchangeApi:
             response = R(url, params=params, data=data, headers=headers,
                          auth=auth)
 
-        if self._logger is not None:
-            self._logger.info("<<< IN:\n%s" % json.dumps({
-                "Status code": response.status_code,
-                "Text": response.text
-            }))
+        self.log_debug("<<< IN:\n%s" % json.dumps({
+            "Status code": response.status_code,
+            "Text": response.text
+        }))
 
         return response
