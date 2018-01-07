@@ -12,6 +12,8 @@ def order_book(source, symbol, depth=5):
 
     if source_name == "poloniex":
         return _order_book_poloniex(source, symbol, depth)
+    elif source_name == "bittrex":
+        return _order_book_bittrex(source, symbol, depth)
     else:
         raise ValueError("Source (%s [%s]) does not support order book"
                          % (source, source_name))
@@ -36,5 +38,23 @@ def _order_book_poloniex(source, symbol, depth=5):
             [[side], ['price', 'quantity']]),
         index=range(1, depth + 1)) for side in ['bids', 'asks']]
     data = pd.concat(data, axis=1).astype('float64')
+
+    return data
+
+
+def _order_book_bittrex(source, symbol, depth=5):
+    """Return the order book from Poloniex
+
+    :param source: Source, an Exchange API object.
+    :param symbol: Symbol.
+    :param depth: Depth of the order book.
+    """
+    response = source.get_order_book(market=symbol, type="both")
+    response.raise_for_status()
+    data = response.json()['result']
+    data = pd.concat([pd.DataFrame(data['buy']), pd.DataFrame(data['sell'])],
+                     axis=1,
+                     keys=['bids', 'asks'])
+    data.index = data.index + 1
 
     return data
