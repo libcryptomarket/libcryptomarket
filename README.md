@@ -36,6 +36,7 @@ pip install git+https://github.com/libcryptomarket/libcryptomarket.git
 |---|---|---|
 | [Bitfinex](https://docs.bitfinex.com/v2/docs/ws-general) | v | x |
 | [BitMEX](https://www.bitmex.com/api/explorer/) | v | x |
+| [Bittrex](https://bittrex.com/home/api) | v | x |
 | [CoinMarketCap](https://coinmarketcap.com/api/) | v | x |
 | [GDAX](https://docs.gdax.com/#api) | v | x |
 | [Poloniex](https://poloniex.com/support/api/) | v | v |
@@ -102,6 +103,7 @@ The exchange API methods are always delimited by underscore.
 |---|---|---|---|
 | [Bitfinex](https://docs.bitfinex.com/v2/docs/ws-general) | [candles](https://docs.bitfinex.com/v2/reference#rest-public-candles) | `BitfinexApi().candles(timeframe="1m", symbol="tBTCUSD", session="hist")` | https://api.bitfinex.com/v2/candles/trade:1m:tBTCUSD/hist |
 | [BitMEX](https://www.bitmex.com/api/explorer/) | [trades/bucketed](https://www.bitmex.com/api/explorer/#!/Trade/Trade_getBucketed) | `BitmexApi().trade_bucketed(binSize="1m", symbol="XBTUSD")` | https://www.bitmex.com/api/v1/trade/bucketed?binSize=1m&symbol=XBTUSD |
+| [Bittrex](https://bittrex.com/home/api) | [/public/getorderbook](https://bittrex.com/home/api) | `BittrexApi().get_order_book(market="BTC-LTC", type="both")` | https://bittrex.com/api/v1.1/public/getorderbook?market=BTC-LTC&type=both |
 | [CoinMarketCap](https://coinmarketcap.com/api/) | [ticket/<id>/](https://coinmarketcap.com/api/) | `CoinMarketCapApi().ticker(id="bitcoin", convert="EUR")` | https://api.coinmarketcap.com/v1/ticker/bitcoin/?convert=EUR |
 | [GDAX](https://docs.gdax.com/#api) | [/products/<product-id>/candles](https://docs.gdax.com/#get-historic-rates) | `GdaxApi().products_candles(product_id="BTC-USD")` | https://api.gdax.com/products/BTC-USD/candles |
 | [Poloniex](https://poloniex.com/support/api/) | [returnOrderBook](https://poloniex.com/support/api/#returnOrderBook) | `PoloniexApi().return_order_book(currencyPair="BTC_NXT", depth=10)` | https://poloniex.com/public?command=returnOrderBook&currencyPair=BTC_NXT&depth=10 |
