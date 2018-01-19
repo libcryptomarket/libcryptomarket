@@ -3,3 +3,4 @@
 from libcryptomarket.core.historical import historical_ticker
 from libcryptomarket.core.instrument import instruments
 from libcryptomarket.core.order_book import order_book
+from libcryptomarket.core.candle import candles, latest_candles
