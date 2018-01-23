@@ -19,8 +19,8 @@ def candles(source, symbol, start_time, end_time, frequency):
 
         data = source.public_get_returnchartdata(params={
             "currencyPair": symbol,
-            "start": start_time.timestamp(),
-            "end": end_time.timestamp(),
+            "start": round(start_time.timestamp()),
+            "end": round(end_time.timestamp()),
             "period": frequency
         })
 
@@ -31,7 +31,7 @@ def candles(source, symbol, start_time, end_time, frequency):
         })
 
         data.loc[:, 'start_time'] = data['start_time'].apply(
-            pd.Timestamp.fromtimestamp)
+            lambda x : pd.Timestamp.fromtimestamp(x).tz_localize('UTC'))
         data['end_time'] = data['start_time'] + pd.DateOffset(
             seconds=frequency)
 

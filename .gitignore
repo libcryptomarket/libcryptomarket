@@ -64,3 +64,4 @@ target/
 # Others
 .editorconfig
 .github/
+.idea/
