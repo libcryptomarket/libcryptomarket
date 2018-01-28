@@ -4,7 +4,6 @@
 """The setup script."""
 
 from setuptools import setup, find_packages
-from libcryptomarket import __version__
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
@@ -13,8 +12,10 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
+    'ccxt>=1.10.0',
     'pandas>=0.20.0',
-    'requests'
+    'requests',
+    'setuptools_scm',
 ]
 
 setup_requirements = [
@@ -29,13 +30,14 @@ test_requirements = [
 
 setup(
     name='libcryptomarket',
-    version=__version__,
+    use_scm_version=True,
     description="Library for cryptocurrency market information.",
     long_description=readme + '\n\n' + history,
     author="Gavin Chan",
     author_email='gavincyi@gmail.com',
     url='https://github.com/gavincyi/libcryptomarket',
-    packages=['libcryptomarket', 'libcryptomarket.api'],
+    packages=['libcryptomarket', 'libcryptomarket.api',
+              'libcryptomarket.core'],
     include_package_data=True,
     install_requires=requirements,
     license="GNU General Public License v3",
@@ -51,6 +53,8 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
+    entry_points={'console_scripts': [
+        'request-candles=libcryptomarket.cli.candles:main']},
     test_suite='tests',
     tests_require=test_requirements,
     setup_requires=setup_requirements,

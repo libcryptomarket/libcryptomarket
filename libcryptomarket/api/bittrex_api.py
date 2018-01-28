@@ -2,38 +2,43 @@
 from libcryptomarket.api.exchange_api import ExchangeApi
 
 
-class CoinMarketCapApi(ExchangeApi):
-    """Coinmarketcap API.
+class BittrexApi(ExchangeApi):
+    """Bittrex API.
     """
 
-    def __init__(self, logger=None):
+    def __init__(self, public_key=None, private_key=None, logger=None):
         """Constructor.
 
         :param public_key: Public key.
         :param private_key: Private key.
         :param logger: Logger.
         """
-        ExchangeApi.__init__(self, public_key=None, private_key=None,
-                             logger=logger)
+        ExchangeApi.__init__(self, public_key, private_key, logger)
 
     @classmethod
     def get_url(cls):
         """Get API url.
         """
-        return "https://api.coinmarketcap.com/v1"
+        return "https://bittrex.com/api"
 
     @classmethod
     def get_public_calls(cls):
         """Get public API calls.
         """
         return {
-            "ticker": "GET",
-            "global": "GET"
+            'getmarkets': 'GET',
+            'getcurrencies': 'GET',
+            'getticker': 'GET',
+            'getmarketsummaries': 'GET',
+            'getmarketsummary': 'GET',
+            'getorderbook': 'GET',
+            'getmarkethistory': 'GET',
+            'getticks': 'GET',
         }
 
     @classmethod
     def get_private_calls(cls):
-        """Get private API calls.
+        """Get public API calls.
         """
         return {}
 
@@ -47,7 +52,7 @@ class CoinMarketCapApi(ExchangeApi):
 
         :param name: Method name (underscored).
         """
-        return name
+        return name.replace("_", "")
 
     def _request_public(self, name, http_method, **kwargs):
         """Request public API call.
@@ -55,16 +60,18 @@ class CoinMarketCapApi(ExchangeApi):
         :param name: Method name.
         :param http_method: HTTP method (POST, GET, DELETE).
         """
-        name_list = [name]
+        self.log_info("Public request:\n" +
+                      "name: {}\n".format(name) +
+                      "http_method: {}\n".format(http_method) +
+                      "kwargs: {}".format(kwargs))
 
-        if name == "ticker" and "id" in kwargs.keys():
-            name_list.append(kwargs["id"])
-            del kwargs["id"]
-
-        name_list.append("")
+        if name == 'getticks':
+            return self._send_request(
+                command="/v2/public/" + name, http_method=http_method,
+                public_method=True, params=kwargs)
 
         return self._send_request(
-            command='/'.join(name_list), http_method=http_method,
+            command="/v1.1/public/" + name, http_method=http_method,
             public_method=True, params=kwargs)
 
     def _request_private(self, name, http_method, **kwargs):
@@ -73,4 +80,4 @@ class CoinMarketCapApi(ExchangeApi):
         :param name: Method name.
         :param http_method: HTTP method (POST, GET, DELETE).
         """
-        raise RuntimeError("No private method provided")
+        raise NotImplementedError("Not support private api at this moment.")
