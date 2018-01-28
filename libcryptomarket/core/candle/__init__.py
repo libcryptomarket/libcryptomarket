@@ -1,7 +1,28 @@
 from datetime import datetime, timedelta
+from time import sleep
 
 import pandas as pd
 import ccxt
+
+from .exchanges import *        # noqa
+
+FREQUENCY_TO_SEC_DICT = {
+    '1m': 60,
+    '5m': 300,
+    '15m': 900,
+    '30m': 1800,
+    '1h': 3600,
+    '3h': 10800,
+    '6h': 21600,
+    '12h': 43200,
+    '1d': 86400,
+    '1w': 86400 * 7,
+    '2w': 86400 * 7 * 2,
+    '1M': 86400 * 30,
+}
+
+FREQUENCY_TO_SEC_DICT.update(dict(
+    [(value, value) for value in FREQUENCY_TO_SEC_DICT.values()]))
 
 
 def candles(source, symbol, start_time, end_time, frequency):
@@ -14,31 +35,48 @@ def candles(source, symbol, start_time, end_time, frequency):
     :param frequency: `int` frequency in seconds.
     """
 
-    if source.lower() == 'poloniex':
-        source = getattr(ccxt, source.lower())()
+    source = source.lower()
+    func_name = "%s_candles" % source
+    func = globals().get(func_name)
 
-        data = source.public_get_returnchartdata(params={
-            "currencyPair": symbol,
-            "start": round(start_time.timestamp()),
-            "end": round(end_time.timestamp()),
-            "period": frequency
-        })
+    if source == "bitfinex":
+        # Always use version 2 for bitfinex
+        source += "2"
 
-        data = pd.DataFrame(data).rename(columns={
-            'date': 'start_time',
-            'quoteVolume': 'quote_volume',
-            'weightedAverage': 'weighted_average'
-        })
+    exchange = getattr(ccxt, source.lower())()
+    describe = exchange.describe()
 
-        data.loc[:, 'start_time'] = data['start_time'].apply(
-            lambda x : pd.Timestamp.fromtimestamp(x).tz_localize('UTC'))
-        data['end_time'] = data['start_time'] + pd.DateOffset(
-            seconds=frequency)
-
-        return data
-    else:
+    if func is None:
         raise ValueError("Source {} is not implemented".format(
             source.__class__.__name__))
+
+    # Initialization
+    frequency = describe['timeframes'][frequency]
+
+    all_data = []
+    last_start_time = None
+
+    while start_time < end_time:
+        sleep(describe['rateLimit'] / 1000)
+        data = func(source=exchange, symbol=symbol, start_time=start_time,
+                    end_time=end_time, frequency=frequency)
+
+        if len(data) == 0:
+            break
+
+        if (last_start_time is not None and
+                data["start_time"].iloc[0] >= last_start_time):
+            break
+
+        all_data.append(data)
+        start_time = data["end_time"].iloc[-1]
+
+    if len(all_data) == 0:
+        raise ValueError("Start time cannot be after end time.")
+    elif len(all_data) == 1:
+        return all_data[0]
+    else:
+        return pd.concat(all_data)
 
 
 def latest_candles(source, symbols, frequency, frequency_count, end_time=None):
@@ -58,9 +96,9 @@ def latest_candles(source, symbols, frequency, frequency_count, end_time=None):
         end_time = datetime.utcnow()
 
     closest_end_time = pd.Timestamp(end_time).floor(
-        timedelta(seconds=frequency))
+        timedelta(seconds=FREQUENCY_TO_SEC_DICT[frequency]))
     start_time = closest_end_time - timedelta(
-        seconds=frequency * frequency_count)
+        seconds=FREQUENCY_TO_SEC_DICT[frequency] * frequency_count)
 
     all_data = []
     for symbol in symbols:
