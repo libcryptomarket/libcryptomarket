@@ -98,7 +98,7 @@ def latest_candles(source, symbols, frequency, frequency_count, end_time=None):
     closest_end_time = pd.Timestamp(end_time).floor(
         timedelta(seconds=FREQUENCY_TO_SEC_DICT[frequency]))
     start_time = closest_end_time - timedelta(
-        seconds=FREQUENCY_TO_SEC_DICT[frequency] * frequency_count)
+        seconds=FREQUENCY_TO_SEC_DICT[frequency] * (frequency_count + 1))
 
     all_data = []
     for symbol in symbols:
@@ -111,6 +111,6 @@ def latest_candles(source, symbols, frequency, frequency_count, end_time=None):
         all_data.append(data.set_index(['start_time', 'end_time']))
 
     if len(all_data) == 1:
-        return all_data[0]
+        return all_data[0].iloc[1:, :]
     else:
-        return pd.concat(all_data, axis=1, keys=symbols)
+        return pd.concat(all_data, axis=1, keys=symbols).iloc[1:, :]
