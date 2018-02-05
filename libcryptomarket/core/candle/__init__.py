@@ -24,14 +24,21 @@ FREQUENCY_TO_SEC_DICT.update(dict(
 
 from .exchanges import *        # noqa
 
-def candles(source, symbol, start_time, end_time, frequency):
-    """Return candles of a given period and frequency.
+
+def candles(source, symbol, start_time, end_time, frequency, **kwargs):
+    r"""Return candles of a given period and frequency.
 
     :param source: `str` exchange name.
     :param symbol: `str` symbol.
     :param start_time: `datetime` start time.
     :param end_time: `datetime` end time.
     :param frequency: `str` frequency.
+    :param \**kwargs:
+        See below
+
+    :Keyword Arguments:
+        * *quote_currency* (``str``) --
+          Quote currency symbol, e.g. BTC.
     """
 
     source = source.lower()
@@ -57,7 +64,7 @@ def candles(source, symbol, start_time, end_time, frequency):
            end_time - pd.DateOffset(seconds=FREQUENCY_TO_SEC_DICT[frequency])):
         sleep(describe['rateLimit'] / 1000)
         data = func(source=exchange, symbol=symbol, start_time=start_time,
-                    end_time=end_time, frequency=frequency)
+                    end_time=end_time, frequency=frequency, **kwargs)
 
         if len(data) == 0:
             break
@@ -78,7 +85,8 @@ def candles(source, symbol, start_time, end_time, frequency):
         return pd.concat(all_data)
 
 
-def latest_candles(source, symbols, frequency, frequency_count, end_time=None):
+def latest_candles(source, symbols, frequency, frequency_count, end_time=None,
+                   **kwargs):
     """Return the latest candles based on the frequency and its count.
 
     :param source: `str` exchange name.
@@ -87,6 +95,12 @@ def latest_candles(source, symbols, frequency, frequency_count, end_time=None):
     :param frequency: `str` frequency.
     :param end_time: `datetime` end time. Default is None which will use
                      current time.
+    :param \**kwargs:
+        See below
+
+    :Keyword Arguments:
+        * *quote_currency* (``str``) --
+          Quote currency symbol, e.g. BTC.
     """
     if isinstance(symbols, str):
         symbols = [symbols]
@@ -105,7 +119,8 @@ def latest_candles(source, symbols, frequency, frequency_count, end_time=None):
                        symbol=symbol,
                        start_time=start_time,
                        end_time=closest_end_time,
-                       frequency=frequency)
+                       frequency=frequency,
+                       **kwargs)
         data = data[data['end_time'] <= closest_end_time]
         all_data.append(data.set_index(['start_time', 'end_time']))
 
