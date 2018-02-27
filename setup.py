@@ -12,9 +12,9 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'ccxt>=1.10.0',
+    'ccxt==1.10.1198',
     'pandas>=0.20.0',
-    'requests',
+    'requests==2.11.0',
     'setuptools_scm',
 ]
 

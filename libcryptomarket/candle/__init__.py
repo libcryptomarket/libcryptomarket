@@ -4,6 +4,7 @@ from time import sleep
 import pandas as pd
 import ccxt
 
+
 FREQUENCY_TO_SEC_DICT = {
     '1m': 60,
     '5m': 300,
@@ -21,8 +22,6 @@ FREQUENCY_TO_SEC_DICT = {
 
 FREQUENCY_TO_SEC_DICT.update(dict(
     [(value, value) for value in FREQUENCY_TO_SEC_DICT.values()]))
-
-from .exchanges import *        # noqa
 
 
 def candles(source, symbol, start_time, end_time, frequency, **kwargs):
