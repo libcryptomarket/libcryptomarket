@@ -3,7 +3,9 @@ import logging
 
 import pandas as pd
 
-from libcryptomarket import *
+# pylint: disable-msg=W0401
+from libcryptomarket.exchange import *  # flake8: noqa
+from libcryptomarket import FREQUENCY_TO_SEC_DICT
 
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
