@@ -5,9 +5,11 @@ import pandas as pd
 
 # pylint: disable-msg=W0401
 from libcryptomarket.exchange import *  # flake8: noqa
-from libcryptomarket import FREQUENCY_TO_SEC_DICT
 
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+FREQUENCIES = ['1m', '5m', '15m', '30m', '1h', '3h', '6h', '12h', '1d',
+               '1w', '2w', '1M', ]
 
 
 def get_args():
@@ -22,7 +24,7 @@ def get_args():
                         type=str, nargs='+', required=True)
     parser.add_argument('--frequency', action='store', dest='frequency',
                         help='Frequency.',
-                        choices=list(FREQUENCY_TO_SEC_DICT.keys()),
+                        choices=list(FREQUENCIES),
                         required=True)
     parser.add_argument('--start-time', action='store', dest='start_time',
                         help='Start time in format of \'YYYY-MM-DD\'',
