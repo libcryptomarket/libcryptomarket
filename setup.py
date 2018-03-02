@@ -14,7 +14,7 @@ with open('HISTORY.rst') as history_file:
 requirements = [
     'ccxt==1.10.1198',
     'pandas>=0.20.0',
-    'requests==2.11.0',
+    'requests[security]',
     'setuptools_scm',
 ]
 

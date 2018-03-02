@@ -3,7 +3,7 @@ import logging
 
 import pandas as pd
 
-from libcryptomarket.core import candles, FREQUENCY_TO_SEC_DICT
+from libcryptomarket import *
 
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
@@ -51,13 +51,15 @@ def main():
 
     all_data = {}
 
+    exchange = globals()[args.exchange.lower()]
+
     for symbol in args.symbols:
         logging.info('Querying symbol %s...', symbol)
-        data = candles(source=args.exchange,
-                       symbol=symbol,
-                       start_time=start_time,
-                       end_time=end_time,
-                       frequency=args.frequency)
+        data = exchange().fetch_candles(
+            symbol=symbol,
+            start_time=start_time,
+            end_time=end_time,
+            frequency=args.frequency)
         all_data[symbol] = data.set_index(['start_time'], ['end_time'])
 
     logging.info('Cleaning the data...')
