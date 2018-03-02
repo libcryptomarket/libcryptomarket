@@ -3,9 +3,13 @@ import logging
 
 import pandas as pd
 
-from libcryptomarket.core import candles, FREQUENCY_TO_SEC_DICT
+# pylint: disable-msg=W0401
+from libcryptomarket.exchange import *  # flake8: noqa
 
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+FREQUENCIES = ['1m', '5m', '15m', '30m', '1h', '3h', '6h', '12h', '1d',
+               '1w', '2w', '1M', ]
 
 
 def get_args():
@@ -20,7 +24,7 @@ def get_args():
                         type=str, nargs='+', required=True)
     parser.add_argument('--frequency', action='store', dest='frequency',
                         help='Frequency.',
-                        choices=list(FREQUENCY_TO_SEC_DICT.keys()),
+                        choices=list(FREQUENCIES),
                         required=True)
     parser.add_argument('--start-time', action='store', dest='start_time',
                         help='Start time in format of \'YYYY-MM-DD\'',
@@ -51,13 +55,15 @@ def main():
 
     all_data = {}
 
+    exchange = globals()[args.exchange.lower()]
+
     for symbol in args.symbols:
         logging.info('Querying symbol %s...', symbol)
-        data = candles(source=args.exchange,
-                       symbol=symbol,
-                       start_time=start_time,
-                       end_time=end_time,
-                       frequency=args.frequency)
+        data = exchange().fetch_candles(
+            symbol=symbol,
+            start_time=start_time,
+            end_time=end_time,
+            frequency=args.frequency)
         all_data[symbol] = data.set_index(['start_time'], ['end_time'])
 
     logging.info('Cleaning the data...')

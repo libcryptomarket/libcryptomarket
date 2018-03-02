@@ -4,6 +4,7 @@ from time import sleep
 import pandas as pd
 import ccxt
 
+
 FREQUENCY_TO_SEC_DICT = {
     '1m': 60,
     '5m': 300,
@@ -21,8 +22,6 @@ FREQUENCY_TO_SEC_DICT = {
 
 FREQUENCY_TO_SEC_DICT.update(dict(
     [(value, value) for value in FREQUENCY_TO_SEC_DICT.values()]))
-
-from .exchanges import *        # noqa
 
 
 def candles(source, symbol, start_time, end_time, frequency, **kwargs):
@@ -73,9 +72,12 @@ def candles(source, symbol, start_time, end_time, frequency, **kwargs):
                 data["start_time"].iloc[0] >= last_start_time):
             break
 
-        start_time = data["end_time"].iloc[-1]
-
         all_data.append(data)
+
+        if data["end_time"].iloc[-1] > start_time:
+            start_time = data["end_time"].iloc[-1]
+        else:
+            break
 
     if len(all_data) == 0:
         raise ValueError("Start time cannot be after end time.")
