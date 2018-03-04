@@ -96,3 +96,25 @@ def gdax_candles(source, symbol, start_time, end_time, frequency,
         seconds=FREQUENCY_TO_SEC_DICT[frequency])
 
     return data
+
+  
+def bitmex_candles(source, symbol, start_time, end_time, frequency,
+                 **kwargs):
+    """Bitmex candles.
+    """
+    data = source.public_get_trade_bucketed(params={
+        "symbol": symbol,
+        "startTime": start_time.isoformat(),
+        "endTime": end_time.isoformat(),
+        "binSize": frequency
+    })
+
+    data = pd.DataFrame(data).rename(columns={
+        'timestamp': 'start_time'})
+
+    data.loc[:, 'start_time'] = data['start_time'].apply(
+        lambda x: pd.to_datetime(x))
+    data['end_time'] = data['start_time'] + pd.DateOffset(
+        seconds=FREQUENCY_TO_SEC_DICT[frequency])
+
+    return data
