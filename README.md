@@ -44,7 +44,7 @@ from datetime import datetime
 import libcryptomarket
 
 poloniex = libcryptomarket.poloniex()
-candles = libcryptomarket.fetch_candles(
+candles = poloniex.fetch_candles(
     symbol="ETH/BTC",
     start_time=datetime(2018, 1, 1),
     end_time=datetime(2018, 1, 30),
@@ -58,7 +58,7 @@ from datetime import datetime
 import libcryptomarket
 
 poloniex = libcryptomarket.poloniex()
-candles = libcryptomarket.fetch_latest_candles(
+candles = poloniex.fetch_latest_candles(
     symbols=["ETH/BTC", "LTC/BTC"],
     frequency="30m",
     frequency_count=5)
